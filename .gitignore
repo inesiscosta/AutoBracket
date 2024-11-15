@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# Mac Os Finder hidden files
+.DS_Store
