@@ -1,10 +1,12 @@
 CFLAGS = -std=c++11 -O3 -Wall -lm
+.PHONY: clean
 
-main: main.cpp
-	g++ $(CFLAGS) main.cpp -o main
+main: clean main.cpp
+	g++ $(CFLAGS) main.cpp -o main.out
 
 clean:
-	rm -f *.o main
+	rm -f *.o main.out
 
-run: clean main
-	./main
+run: main
+	./main.out
+	$(MAKE) clean
