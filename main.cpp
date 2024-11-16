@@ -1,15 +1,29 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <vector>
+#include <string>
 
 int main() {
     int _N, _M, desiredResult;
     std::vector<std::vector<int>> operationTable;
     std::vector<int> sequence;
+    int _N, _M, desiredResult;
+    std::vector<std::vector<int>> operationTable;
+    std::vector<int> sequence;
 
+    /* FUNCTION readInput */
+    //---------------------------------------------------------------
     // Reads the two sizes from the input
     std::cin >> _N >> _M;
 
+    // Reads the lines that represent the results of the operations from the input
+    operationTable.resize(_N, std::vector<int>(_N));
+    for (int i = 0; i < _N; ++i) {
+        for (int j = 0; j < _N; ++j) {
+            std::cin >> operationTable[i][j];
+        }
+    }
     // Reads the lines that represent the results of the operations from the input
     operationTable.resize(_N, std::vector<int>(_N));
     for (int i = 0; i < _N; ++i) {
@@ -26,11 +40,18 @@ int main() {
 
     // Read the expected result from the input
     std::cin >> desiredResult;
+    //---------------------------------------------------------------
+    /* END FUNCTION readInput */
 
+    /* FUNCTION parentization */
+    //---------------------------------------------------------------
     // Empty string to store the parenthesized sequence
     std::string parentizedSequence;
     bool found = false;
 
+    int len_sequence = sequence.size();
+    std::vector<std::vector<int>> dp(len_sequence, std::vector<int>(len_sequence, -1)); // Dynamic programming table
+    std::vector<std::vector<std::string>> parentizations(len_sequence, std::vector<std::string>(len_sequence));
     int len_sequence = sequence.size();
     std::vector<std::vector<int>> dp(len_sequence, std::vector<int>(len_sequence, -1)); // Dynamic programming table
     std::vector<std::vector<std::string>> parentizations(len_sequence, std::vector<std::string>(len_sequence));
@@ -58,10 +79,14 @@ int main() {
             }
         }
     }
-
+    //---------------------------------------------------------------
+    /* END FUNCTION parentization   */
+    
+    // Print found result and parenthisised expression
     if (found) {
-        std::cout << "1\n" << parentizedSequence << std::endl;
-    } else {
-        std::cout << "0" << std::endl;
+        std::cout << "1" << std::endl << parentizedSequence << std::endl;
+        return 0;
     }
+    std::cout << "0" << std::endl;
+    return 1;
 }
