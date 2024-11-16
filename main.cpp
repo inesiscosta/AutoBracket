@@ -3,39 +3,72 @@
 
 int main() {
 
-  int N, M, result;
-  std::vector<std::vector<int>> table;
+  int _N, _M, desiredResult;
+  std::vector<std::vector<int>> operationTable;
   std::vector<int> sequence;
 
+  /* FUNCTION readInput */
+  //---------------------------------------------------------------
   // Reads the two sizes from the input
-  std::cin >> N >> M;
+  std::cin >> _N >> _M;
 
   // Reads the lines that represnt the results of the operations from the input
-  table.resize(N, std::vector<int>(N));
-  for (int i = 0; i < N; ++i) {
-      for (int j = 0; j < N; ++j) {
-          std::cin >> table[i][j];
-      }
+  operationTable.resize(_N, std::vector<int>(_N));
+  for (int i = 0; i < _N; ++i) {
+    for (int j = 0; j < _N; ++j) {
+      std::cin >> operationTable[i][j];
+    }
   }
 
   // Reads the sequence of integers to wich the operation is applied from the input
-  sequence.resize(M, 0);
-  for (int i = 0; i < M; ++i) {
-      std::cin >> sequence[i];
+  sequence.resize(_M, 0);
+  for (int i = 0; i < _M; ++i) {
+    std::cin >> sequence[i];
   }
   // Read the expeted result from the input
-  std::cin >> result;
+  std::cin >> desiredResult;
+  //---------------------------------------------------------------
+  /* END FUNCTION readInput */
 
-  // Checks if it is possible to parenthesize
-  while (sequence.size() > 1) { // Acaba quando todas as operacoes foram feitas na sequencia sobra um numero
-      std::vector<int> new_sequence; // Vetor temporario para guardar o resultado da primeira operacao e os restantes elementos da sequencia
-      for (size_t i = 0; i < sequence.size() - 1; ++i) { // Percorre a sequencia mas incrementa primeiro de forma a evitar seg fault (nao gosto muito)
-          int new_value = table[sequence[i] - 1][sequence[i + 1] - 1]; // Usa a tabela para ir buscar o valor correspondente a operacao (se calhar guardar a table sem indice para coincidir??)
-          new_sequence.push_back(new_value);
-      }
-      sequence = new_sequence; // A sequencia passa a ser a nova sequencia resultado mais os restantes
+  /* FUNCTION parentization */
+  //---------------------------------------------------------------
+  // Empty string to store the parentized sequence
+  std::string parentizedSequence;
+
+  int len_sequence = sequence.size();
+  std::vector<std::vector<std::vector<int>>> dp(len_sequence, std::vector<std::vector<int>>(len_sequence));
+  std::vector<std::vector<std::vector<std::string>>> parentizations(len_sequence, std::vector<std::vector<std::string>>(len_sequence));
+
+  bool found = false;
+  int result = 0;
+
+  for (int i = 0; i < len_sequence; ++i) {
+    dp[i][i] = {sequence[i]};
+    parentizations[i][i] = {std::to_string(sequence[i])};
   }
 
-  // Print the final item in the sequence
-  std::cout << sequence[0] << std::endl;
+  for (int len = 2; len <= len_sequence && !found; ++len) {
+    for (int i = 0; i <= len_sequence - len && !found; ++i) {
+      int j = i + len - 1;
+      for (int k = i; k < j && !found; ++k) {
+        for (int left : dp[i][k]) {
+          for (int right : dp[k + 1][j]) {
+            result = operationTable[left-1][right-1];
+            dp[i][j].push_back(result);
+            parentizations[i][j].push_back("(" + parentizations[i][k][0] + " " + parentizations[k + 1][j][0] + ")");
+            if (result == desiredResult) {
+              parentizedSequence = parentizations[i][j].back();
+              found = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  //---------------------------------------------------------------
+  /* END FUNCTION parentization
+
+  // Print found result and parenthisised expression
+  std::cout << result << std::endl << parentizedSequence << std::endl;
 }
