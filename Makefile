@@ -2,7 +2,7 @@
 CXX = g++
 CXXFLAGS = -std=c++11 -O3 -Wall -lm
 
-.PHONY: all test run clean format
+.PHONY: all test run clean format remove-tests
 
 # Compile the program
 TARGET = main.out
@@ -36,6 +36,10 @@ run: $(TARGET)
 # Clean up generated files
 clean:
 	@rm -f $(TARGET)
+
+# Remove test result files
+remove-tests:
+	@rm -f tests/*_result.txt
 
 format:
 	clang-format -i $(SRCS)

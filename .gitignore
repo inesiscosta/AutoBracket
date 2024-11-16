@@ -33,3 +33,9 @@
 
 # Mac Os Finder hidden files
 .DS_Store
+
+# Test Results
+tests/*_result.txt
+
+# VScode
+.vscode
