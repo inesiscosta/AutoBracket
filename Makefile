@@ -1,15 +1,41 @@
-CFLAGS = -std=c++11 -O3 -Wall -lm
-.PHONY: clean format
+# Compiler and flags
+CXX = g++
+CXXFLAGS = -std=c++11 -O3 -Wall -lm
 
-main: clean main.cpp
-	g++ $(CFLAGS) main.cpp -o main.out
+.PHONY: all test run clean format
 
-clean:
-	rm -f *.o main.out
+# Compile the program
+TARGET = main.out
+SRCS = main.cpp
 
-run: main
-	./main.out
+all: $(TARGET)
+
+$(TARGET): $(SRCS)
+	@$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRCS)
+
+# Run tests
+test: $(TARGET)
+	@for input in $(wildcard tests/*_input.txt); do \
+		output=$${input%_input.txt}_output.txt; \
+		result=$${input%_input.txt}_result.txt; \
+		./$(TARGET) < $$input > $$result; \
+		if diff -q $$result $$output > /dev/null; then \
+			echo "Test $${input##*/} passed"; \
+		else \
+			echo "Test $${input##*/} failed"; \
+			diff $$result $$output; \
+		fi; \
+	done; \
 	$(MAKE) clean
 
+# Run the program and wait for input from stdin
+run: $(TARGET)
+	@./$(TARGET)
+	@$(MAKE) clean
+
+# Clean up generated files
+clean:
+	@rm -f $(TARGET)
+
 format:
-  clang-format -i main.cpp
+	clang-format -i $(SRCS)

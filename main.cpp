@@ -9,8 +9,11 @@ int main() {
   std::vector<std::vector<int>> operationTable;
   std::vector<int> sequence;
 
+<<<<<<< HEAD
   /* FUNCTION readInput */
   //---------------------------------------------------------------
+=======
+>>>>>>> 0a94cf4 (Changed Makefile to run tests)
   // Reads the two sizes from the input
   std::cin >> _N >> _M;
 
@@ -30,11 +33,15 @@ int main() {
 
   // Read the expected result from the input
   std::cin >> desiredResult;
+<<<<<<< HEAD
   //---------------------------------------------------------------
   /* END FUNCTION readInput */
 
   /* FUNCTION parentization */
   //---------------------------------------------------------------
+=======
+
+>>>>>>> 0a94cf4 (Changed Makefile to run tests)
   // Empty string to store the parenthesized sequence
   std::string parentizedSequence;
   bool found = false;
@@ -66,6 +73,7 @@ int main() {
       }
     }
   }
+<<<<<<< HEAD
   //---------------------------------------------------------------
   /* END FUNCTION parentization   */
   
@@ -77,3 +85,12 @@ int main() {
   std::cout << "0" << std::endl;
   return 1;
 }
+=======
+
+  if (found) {
+      std::cout << "1\n" << parentizedSequence << std::endl;
+  } else {
+      std::cout << "0" << std::endl;
+  }
+}
+>>>>>>> 0a94cf4 (Changed Makefile to run tests)
