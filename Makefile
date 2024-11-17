@@ -1,45 +1,49 @@
-# Compiler and flags
 CXX = g++
 CXXFLAGS = -std=c++11 -O3 -Wall -lm
 
-.PHONY: all test run clean format remove-tests
+.PHONY: all run test clean rm format
 
-# Compile the program
-TARGET = main.out
-SRCS = mergeAttempt.cpp
+TARGET = main
+SRCS = main.cpp
 
 all: $(TARGET)
 
 $(TARGET): $(SRCS)
 	@$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRCS)
 
-# Run tests
-test: $(TARGET)
-	@for input in $(wildcard tests/*_input.txt); do \
-		output=$${input%_input.txt}_output.txt; \
-		result=$${input%_input.txt}_result.txt; \
-		./$(TARGET) < $$input > $$result; \
-		if diff -q $$result $$output > /dev/null; then \
-			echo "Test $${input##*/} passed"; \
-		else \
-			echo "Test $${input##*/} failed"; \
-			diff $$result $$output; \
-		fi; \
-	done; \
-	$(MAKE) clean
-
-# Run the program and wait for input from stdin
 run: $(TARGET)
 	@./$(TARGET)
 	@$(MAKE) clean
 
-# Clean up generated files
+test: $(TARGET)
+	@passed_tests=0; \
+	total_tests=0; \
+	for input in $(wildcard tests/*.in); do \
+		total_tests=$$((total_tests + 1)); \
+		output=$${input%.in}.out; \
+		result=$${input%.in}.result; \
+		diff_file=$${input%.in}.diff; \
+		./$(TARGET) < $$input > $$result; \
+		if diff -q $$result $$output > /dev/null; then \
+			printf "."; \
+			passed_tests=$$((passed_tests + 1)); \
+		else \
+			echo ""; \
+			test_name=$$(basename $$input .in); \
+			echo "Failed $$test_name: See file $$diff_file"; \
+			diff $$result $$output > $$diff_file; \
+		fi; \
+	done; \
+	echo ""; \
+	echo "Tests passed $$passed_tests out of $$total_tests"; \
+	$(MAKE) clean
+
 clean:
 	@rm -f $(TARGET)
 
-# Remove test result files
-remove-tests:
-	@rm -f tests/*_result.txt
+rm:
+	@$(MAKE) clean
+	@rm -f tests/*.result tests/*.diff
 
 format:
-	clang-format -i $(SRCS)
+	@clang-format -i $(SRCS)

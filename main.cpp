@@ -20,7 +20,8 @@ int main() {
     }
   }
 
-  // Reads the sequence of integers to which the operation is applied from the input
+  // Reads the sequence of integers to which the operation is applied from the
+  // input
   sequence.resize(_M, 0);
   for (int i = 0; i < _M; ++i) {
     std::cin >> sequence[i];
@@ -38,8 +39,10 @@ int main() {
   bool found = false;
 
   int len_sequence = sequence.size();
-  std::vector<std::vector<int>> dp(len_sequence,std::vector<int>(len_sequence, -1));  // Dynamic programming table
-  std::vector<std::vector<std::string>> parentizations(len_sequence, std::vector<std::string>(len_sequence));
+  std::vector<std::vector<int>> dp(
+  len_sequence, std::vector<int>(len_sequence, -1));  // Dynamic programming table
+  std::vector<std::vector<std::string>> parentizations(
+  len_sequence, std::vector<std::string>(len_sequence));
 
   for (int i = 0; i < len_sequence; ++i) {
     dp[i][i] = sequence[i];
@@ -55,7 +58,8 @@ int main() {
         if (left != -1 && right != -1) {
           int result = operationTable[left - 1][right - 1];
           dp[i][j] = result;
-          parentizations[i][j] = "(" + parentizations[i][k] + " " + parentizations[k + 1][j] + ")";
+          parentizations[i][j] =
+          "(" + parentizations[i][k] + " " + parentizations[k + 1][j] + ")";
           if (result == desiredResult && len == len_sequence) {
             parentizedSequence = parentizations[i][j];
             found = true;

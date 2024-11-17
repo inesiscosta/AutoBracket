@@ -28,14 +28,14 @@
 
 # Executables
 *.exe
-*.out
 *.app
 
 # Mac Os Finder hidden files
 .DS_Store
 
 # Test Results
-tests/*_result.txt
+tests/*.diff
+tests/*.result
 
 # VScode
 .vscode
