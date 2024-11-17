@@ -31,7 +31,7 @@ test: $(TARGET)
 			echo ""; \
 			test_name=$$(basename $$input .in); \
 			echo "Failed $$test_name: See file $$diff_file"; \
-			diff $$result $$output > $$diff_file; \
+			diff $$result $$output | tee $$diff_file; \
 		fi; \
 	done; \
 	echo ""; \
