@@ -19,14 +19,14 @@ test: $(TARGET)
 	@passed_tests=0; \
 	total_tests=0; \
 	for input in $(wildcard tests/*.in); do \
-		total_tests=$$((total_tests + 1)); \
+		((total_tests++)); \
 		output=$${input%.in}.out; \
 		result=$${input%.in}.result; \
 		diff_file=$${input%.in}.diff; \
 		./$(TARGET) < $$input > $$result; \
 		if diff -q $$result $$output > /dev/null; then \
 			printf "."; \
-			passed_tests=$$((passed_tests + 1)); \
+			((passed_tests++)); \
 		else \
 			echo ""; \
 			test_name=$$(basename $$input .in); \
