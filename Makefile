@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++11 -O3 -Wall -lm
 
-.PHONY: all run test clean rm format
+.PHONY: all run test time clean rm format
 
 TARGET = main
 SRCS = main.cpp
@@ -37,6 +37,14 @@ test: $(TARGET)
 	echo ""; \
 	echo "Tests passed $$passed_tests out of $$total_tests"; \
 	$(MAKE) clean
+
+time: $(TARGET)
+	@for input in $(wildcard tests/*.in); do \
+		test_name=$$(basename $$input .in); \
+		echo "$$test_name: "; \
+		output=$${input%.in}.out; \
+		{ time ./$(TARGET) < $$input > /dev/null; } 2>&1 | grep -E 'real|user|sys';\
+	done
 
 clean:
 	@rm -f $(TARGET)

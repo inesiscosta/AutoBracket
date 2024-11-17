@@ -2,81 +2,79 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 int main() {
   int _N, _M, desiredResult;
-  std::vector<std::vector<int>> operationTable;
-  std::vector<int> sequence;
+  vector<vector<int>> operationTable;
+  vector<int> sequence;
 
-  /* FUNCTION readInput */
-  //---------------------------------------------------------------
-  // Reads the two sizes from the input
-  std::cin >> _N >> _M;
+  cin >> _N >> _M;
 
-  // Reads the lines that represent the results of the operations from the input
-  operationTable.resize(_N, std::vector<int>(_N));
+  operationTable.resize(_N, vector<int>(_N));
   for (int i = 0; i < _N; ++i) {
     for (int j = 0; j < _N; ++j) {
-      std::cin >> operationTable[i][j];
+      cin >> operationTable[i][j];
     }
   }
 
-  // Reads the sequence of integers to which the operation is applied from the
-  // input
-  sequence.resize(_M, 0);
+  sequence.resize(_M);
   for (int i = 0; i < _M; ++i) {
-    std::cin >> sequence[i];
+    cin >> sequence[i];
   }
 
-  // Read the expected result from the input
-  std::cin >> desiredResult;
-  //---------------------------------------------------------------
-  /* END FUNCTION readInput */
+  cin >> desiredResult;
 
-  /* FUNCTION parentization */
-  //---------------------------------------------------------------
-  // Empty string to store the parenthesized sequence
-  std::string parentizedSequence;
-  bool found = false;
+  vector<vector<vector<pair<int, string>>>> dp(
+  _M, vector<vector<pair<int, string>>>(_M));
 
-  int len_sequence = sequence.size();
-  std::vector<std::vector<int>> dp(
-  len_sequence, std::vector<int>(len_sequence, -1));  // Dynamic programming table
-  std::vector<std::vector<std::string>> parentizations(
-  len_sequence, std::vector<std::string>(len_sequence));
-
-  for (int i = 0; i < len_sequence; ++i) {
-    dp[i][i] = sequence[i];
-    parentizations[i][i] = std::to_string(sequence[i]);
+  for (int i = 0; i < _M; ++i) {
+    dp[i][i].emplace_back(sequence[i], to_string(sequence[i]));
   }
 
-  for (int len = 2; len <= len_sequence; ++len) {
-    for (int i = 0; i <= len_sequence - len; ++i) {
-      int j = i + len - 1;
-      for (int k = i; k < j; ++k) {
-        int left = dp[i][k];
-        int right = dp[k + 1][j];
-        if (left != -1 && right != -1) {
-          int result = operationTable[left - 1][right - 1];
-          dp[i][j] = result;
-          parentizations[i][j] =
-          "(" + parentizations[i][k] + " " + parentizations[k + 1][j] + ")";
-          if (result == desiredResult && len == len_sequence) {
-            parentizedSequence = parentizations[i][j];
-            found = true;
+  string correct_expression;
+  bool final_found = false;
+  for (int length = 2; length <= _M; ++length) {
+    bool found = false;
+    for (int i = _M - length; i >= 0 && !found; --i) {
+      int j = i + length - 1;
+      for (int k = j - 1; k >= i && !found; --k) {
+        for (const auto& left : dp[i][k]) {
+          for (const auto& right : dp[k + 1][j]) {
+            int combined_val = operationTable[left.first - 1][right.first - 1];
+            if (combined_val == desiredResult || dp[i][j].size() < 10) {
+              string combined_expr =
+              "(" + left.second + " " + right.second + ")";
+              bool exists = false;
+              for (const auto& p : dp[i][j]) {
+                if (p.first == combined_val) {
+                  exists = true;
+                  break;
+                }
+              }
+              if (!exists) {
+                dp[i][j].emplace_back(combined_val, combined_expr);
+              }
+              if (combined_val == desiredResult && length == _M) {
+                correct_expression = combined_expr;
+                found = true;
+                break;
+              }
+            }
           }
         }
+        if (found) break;
       }
     }
+    if (found && length == _M) {
+      final_found = true;
+      break;
+    }
   }
-
-  //---------------------------------------------------------------
-  /* END FUNCTION parentization   */
-
-  // Print found result and parenthisised expression
-  if (found) {
-    std::cout << "1" << std::endl << parentizedSequence << std::endl;
+  if (final_found) {
+    cout << "1" << std::endl << correct_expression << endl;
     return 0;
   }
-  std::cout << "0" << std::endl;
-  return 1;
+  cout << "0" << endl;
+  return 0;
 }
