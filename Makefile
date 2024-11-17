@@ -6,7 +6,7 @@ CXXFLAGS = -std=c++11 -O3 -Wall -lm
 
 # Compile the program
 TARGET = main.out
-SRCS = main.cpp
+SRCS = mergeAttempt.cpp
 
 all: $(TARGET)
 
