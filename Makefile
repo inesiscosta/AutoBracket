@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -O3 -Wall -lm
+CXXFLAGS = -std=c++11 -O3 -Wall -lm -pg
 
 .PHONY: all run test time clean rm format
 

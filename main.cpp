@@ -1,80 +1,53 @@
-#include <iostream>
 #include <string>
 #include <vector>
-
-using namespace std;
+#include <cstdio>
 
 int main() {
   int _N, _M, desiredResult;
-  vector<vector<int>> operationTable;
-  vector<int> sequence;
+  std::vector<std::vector<int>> operationTable;
+  std::vector<int> sequence;
 
-  cin >> _N >> _M;
+  scanf("%d %d", &_N, &_M);
 
-  operationTable.resize(_N, vector<int>(_N));
+  operationTable.resize(_N, std::vector<int>(_N));
   for (int i = 0; i < _N; ++i) {
     for (int j = 0; j < _N; ++j) {
-      cin >> operationTable[i][j];
+      scanf("%d", &operationTable[i][j]);
     }
   }
 
   sequence.resize(_M);
   for (int i = 0; i < _M; ++i) {
-    cin >> sequence[i];
+    scanf("%d", &sequence[i]);
   }
 
-  cin >> desiredResult;
+  scanf("%d", &desiredResult);
 
-  vector<vector<vector<pair<int, string>>>> dp(
-  _M, vector<vector<pair<int, string>>>(_M));
+  std::vector<std::vector<std::vector<std::pair<int, std::string>>>> resultsTable(
+  _M, std::vector<std::vector<std::pair<int, std::string>>>(_M));
 
   for (int i = 0; i < _M; ++i) {
-    dp[i][i].emplace_back(sequence[i], to_string(sequence[i]));
+    resultsTable[i][i].emplace_back(sequence[i], std::to_string(sequence[i]));
   }
 
-  string correct_expression;
-  bool final_found = false;
   for (int length = 2; length <= _M; ++length) {
-    bool found = false;
-    for (int i = _M - length; i >= 0 && !found; --i) {
+    for (int i = _M - length; i >= 0; --i) {
       int j = i + length - 1;
-      for (int k = j - 1; k >= i && !found; --k) {
-        for (const auto& left : dp[i][k]) {
-          for (const auto& right : dp[k + 1][j]) {
+      for (int k = j - 1; k >= i; --k) {
+        for (const auto& left : resultsTable[i][k]) {
+          for (const auto& right : resultsTable[k + 1][j]) {
             int combined_val = operationTable[left.first - 1][right.first - 1];
-            if (combined_val == desiredResult || dp[i][j].size() < 10) {
-              string combined_expr =
-              "(" + left.second + " " + right.second + ")";
-              bool exists = false;
-              for (const auto& p : dp[i][j]) {
-                if (p.first == combined_val) {
-                  exists = true;
-                  break;
-                }
-              }
-              if (!exists) {
-                dp[i][j].emplace_back(combined_val, combined_expr);
-              }
-              if (combined_val == desiredResult && length == _M) {
-                correct_expression = combined_expr;
-                found = true;
-                break;
-              }
+            std::string combined_expr = "(" + left.second + " " + right.second + ")";
+            resultsTable[i][j].emplace_back(combined_val, combined_expr);
+            if (combined_val == desiredResult && length == _M) {
+              printf("1\n%s\n", combined_expr.c_str());
+              return 0;
             }
           }
         }
-        if (found) break;
       }
     }
-    if (found && length == _M) {
-      final_found = true;
-      break;
-    }
   }
-  if (final_found) {
-    cout << "1" << std::endl << correct_expression << endl;
-    return 0;
-  }
-  cout << "0" << endl;
+  printf("0\n");
   return 0;
 }
