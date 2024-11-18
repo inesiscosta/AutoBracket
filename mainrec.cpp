@@ -26,12 +26,12 @@ MemoEntry solve(int i, int j, int target) {
     }
 
     // Check if the subproblem has already been computed.
-    if (memo[i][j][target].valid) {
+    if (memo[i][j][target].valid || !memo[i][j][target].expr.empty()) {
         return memo[i][j][target];
     }
 
     // Try to split the sequence between i and j.
-    for (int k = j - 1; k >= j; --k) {
+    for (int k = j - 1; k >= i; --k) {
         for (int left = 1; left <= _N; ++left) {
             for (int right = 1; right <= _N; ++right) {
                 MemoEntry leftResult = solve(i, k, left);
