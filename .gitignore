@@ -39,3 +39,6 @@ tests/*.result
 
 # VScode
 .vscode
+
+# Rust Version of the project
+main.rs
