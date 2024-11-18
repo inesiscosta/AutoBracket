@@ -46,6 +46,7 @@ time: $(TARGET)
 		echo "$$test_name: "; \
 		{ time ./$(TARGET) < $$input > /dev/null; } 2>&1 | grep -E 'real|user|sys';\
 	done
+	@$(MAKE) -s clean
 
 clean:
 	@rm -f $(TARGET)
