@@ -1,21 +1,15 @@
-#include <cstdio>
+#include <iostream>
 #include <string>
 #include <vector>
-
-// Define a struct to represent memoization entries.
-struct MemoEntry {
-    bool valid;
-    std::string expr;
-};
 
 // Global variables for input data.
 int _N, _M, desiredResult;
 std::vector<std::vector<int>> operationTable;
 std::vector<int> sequence;
-std::vector<std::vector<std::vector<MemoEntry>>> memo;
+std::vector<std::vector<std::vector<std::pair<bool, std::string>>>> memoizationTable;
 
 // Recursive function to find the correct parenthesization.
-MemoEntry solve(int i, int j, int target) {
+std::pair<bool, std::string> solve(int i, int j, int target) {
     // Base case: when i == j, check if the element matches the target.
     if (i == j) {
         if (sequence[i] == target) {
@@ -26,24 +20,23 @@ MemoEntry solve(int i, int j, int target) {
     }
 
     // Check if the subproblem has already been computed.
-    if (memo[i][j][target].valid || !memo[i][j][target].expr.empty()) {
-        return memo[i][j][target];
+    if (memoizationTable[i][j][target].first || !memoizationTable[i][j][target].second.empty()) {
+        return memoizationTable[i][j][target];
     }
 
     // Try to split the sequence between i and j.
     for (int k = j - 1; k >= i; --k) {
         for (int left = 1; left <= _N; ++left) {
             for (int right = 1; right <= _N; ++right) {
-                MemoEntry leftResult = solve(i, k, left);
-                MemoEntry rightResult = solve(k + 1, j, right);
-
-                if (leftResult.valid && rightResult.valid) {
+                auto leftResult = solve(i, k, left);
+                auto rightResult = solve(k + 1, j, right);
+                if (leftResult.first && rightResult.first) {
                     int combinedVal = operationTable[left - 1][right - 1];
                     if (combinedVal == target) {
                         // Found a valid solution; store and return it.
-                        std::string expr = "(" + leftResult.expr + " " + rightResult.expr + ")";
-                        memo[i][j][target] = {true, expr};
-                        return memo[i][j][target];
+                        std::string expr = "(" + leftResult.second + " " + rightResult.second + ")";
+                        memoizationTable[i][j][target] = {true, expr};
+                        return memoizationTable[i][j][target];
                     }
                 }
             }
@@ -51,35 +44,35 @@ MemoEntry solve(int i, int j, int target) {
     }
 
     // No valid parenthesization found for this subproblem.
-    memo[i][j][target] = {false, ""};
-    return memo[i][j][target];
+    memoizationTable[i][j][target] = {false, ""};
+    return memoizationTable[i][j][target];
 }
 
 int main() {
-    scanf("%d %d", &_N, &_M);
+    std::cin >> _N >> _M;
 
     operationTable.resize(_N, std::vector<int>(_N));
     for (int i = 0; i < _N; ++i) {
         for (int j = 0; j < _N; ++j) {
-            scanf("%d", &operationTable[i][j]);
+            std::cin >> operationTable[i][j];
         }
     }
 
     sequence.resize(_M);
     for (int i = 0; i < _M; ++i) {
-        scanf("%d", &sequence[i]);
+        std::cin >> sequence[i];
     }
 
-    scanf("%d", &desiredResult);
+    std::cin >> desiredResult;
 
     // Initialize memoization table with default invalid values.
-    memo.resize(_M, std::vector<std::vector<MemoEntry>>(_M, std::vector<MemoEntry>(_N + 1, {false, ""})));
+    memoizationTable.resize(_M, std::vector<std::vector<std::pair<bool, std::string>>>(_M, std::vector<std::pair<bool, std::string>>(_N + 1, {false, ""})));
 
-    MemoEntry result = solve(0, _M - 1, desiredResult);
-    if (result.valid) {
-        printf("1\n%s\n", result.expr.c_str());
+    auto result = solve(0, _M - 1, desiredResult);
+    if (result.first) {
+        std::cout << "1" << std::endl << result.second << std::endl;
     } else {
-        printf("0\n");
+        std::cout << "0" << std::endl;
     }
 
     return 0;
