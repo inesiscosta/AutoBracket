@@ -15,11 +15,9 @@ int main() {
 
   // Resize the operator table to _N x _N
   operatorTable.resize(_N, std::vector<int>(_N));
-  for (int i = 0; i < _N; ++i) {
-    for (int j = 0; j < _N; ++j) {
-      // Read the operator table values from stdin
-      std::cin >> operatorTable[i][j];
-    }
+  for (int i = 0; i < _N * _N; ++i) {
+    // Read the operator table values from stdin
+    std::cin >> operatorTable[i / _N][i % _N];
   }
 
   // Initialize DP table and expressions table
