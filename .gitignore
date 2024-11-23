@@ -45,3 +45,7 @@ main.rs
 
 # Ignore GProf
 gmon.out
+
+#Ignore compiled files
+main
+test_generator
