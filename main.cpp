@@ -63,5 +63,5 @@ int main() {
 
   // If no valid expression is found, print 0
   std::cout << "0" << std::endl;
-  return 1; // Return 1 to indicate failure
+  return 0; // Always return 0 the result is indicated in the sdtout
 }
