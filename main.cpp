@@ -1,54 +1,66 @@
 #include <iostream>
-#include <string>
 #include <vector>
+#include <string>
+
+std::string reconstruct(int i, int j, int result, const std::vector<std::vector<std::vector<int>>> &dp, const std::vector<std::vector<int>> &operatorTable, const std::vector<int> &sequence) {
+  if (i == j) {
+    return std::to_string(sequence[i] + 1);
+  }
+  int k = dp[i][j][result];
+  int leftResult = -1, rightResult = -1;
+
+  for (size_t left = 0; left < operatorTable.size() && leftResult == -1; ++left) {
+    for (size_t right = 0; right < operatorTable.size(); ++right) {
+      if (dp[i][k][left] != -1 && dp[k + 1][j][right] != -1 && operatorTable[left][right] == result) {
+        leftResult = left;
+        rightResult = right;
+        break;
+      }
+    }
+  }
+  std::string leftExpr = reconstruct(i, k, leftResult, dp, operatorTable, sequence);
+  std::string rightExpr = reconstruct(k + 1, j, rightResult, dp, operatorTable, sequence);
+  return "(" + leftExpr + " " + rightExpr + ")";
+}
 
 int main() {
-  // CIN/COUT optimizations to attempt to match SCANF/PRINTF
   std::ios::sync_with_stdio(0);
   std::cin.tie(0);
 
-  int n, m, desiredResult; // n = size of a side of the operatorTable matrix, m = length of the sequence
-
+  int n, m;
   std::cin >> n >> m;
 
   std::vector<std::vector<int>> operatorTable(n, std::vector<int>(n));
+  for (int i = 0; i < n; ++i)
+    for (int j = 0; j < n; ++j)
+      std::cin >> operatorTable[i][j], --operatorTable[i][j];
+
   std::vector<int> sequence(m);
-  std::vector<std::vector<std::vector<bool>>> dp(m, std::vector<std::vector<bool>>(m, std::vector<bool>(n + 1, false))); // Stores whether a specific result is achieved for a subsequence
-  std::vector<std::vector<std::vector<std::string>>> expressions(m, std::vector<std::vector<std::string>>(m, std::vector<std::string>(n + 1, ""))); // Stores the expression that achieves a specific result for a subsequence
+  std::vector<std::vector<std::vector<int>>> dp(m, std::vector<std::vector<int>>(m, std::vector<int>(n, -1)));
 
-  for (int i = 0; i < n * n; ++i) {
-    std::cin >> operatorTable[i / n][i % n];
-  }
-
-  // Read the sequence
   for (int i = 0; i < m; ++i) {
-    std::cin >> sequence[i]; // Read the sequence values from stdin
-    // All single elements are their own results and subexpressions
-    dp[i][i][sequence[i]] = true; // Initialize DP table for single elements
-    expressions[i][i][sequence[i]] = std::to_string(sequence[i]); // Initialize expressions for single elements
+    std::cin >> sequence[i], --sequence[i];
+    dp[i][i][sequence[i]] = i;
   }
 
-  // Read the desired result from stdin
-  std::cin >> desiredResult;
+  int targetResult;
+  std::cin >> targetResult, --targetResult;
 
-  // Process all sub-sequences of length 2 to _M
-  for (int length = 2; length <= m; ++length) {
-    for (int i = m - length; i >= 0; --i) { // Compute the start index of the subsequence
-      int j = i + length - 1; // Compute the end index of the subsequence
-      for (int k = j - 1; k >= i; --k) { // Try all possible split points
-        for (int left = 1; left <= n; ++left) { // Try all possible left operators
-          if (!dp[i][k][left]) continue; // Skip if left part is not valid
-          for (int right = 1; right <= n; ++right) {
-            if (!dp[k + 1][j][right]) continue; // Skip if right part is not valid
-            int result = operatorTable[left - 1][right - 1]; // Compute the result using the operator table
-            if (result == desiredResult && length == m) {
-              // If the result matches the desired result and the length is _M, print the expression
-              std::cout << "1" << std::endl << "(" << expressions[i][k][left] << " " << expressions[k + 1][j][right] << ")" << std::endl;
-              return 0;
-            }
-            if (!dp[i][j][result]) {
-              dp[i][j][result] = true; // Mark the result in the DP table as the one achieved from this subsequence
-              expressions[i][j][result] = "(" + expressions[i][k][left] + " " + expressions[k + 1][j][right] + ")"; // Store the formatted expression
+  for (int len = 2; len <= m; ++len) {
+    for (int i = 0; i <= m - len; ++i) {
+      int j = i + len - 1;
+      int results_count = 0;
+      for (int k = j - 1; k >= i && results_count < n; --k) {
+        for (int left = 0; left < n && results_count < n; ++left) {
+          if (dp[i][k][left] != -1) {
+            for (int right = 0; right < n && results_count < n; ++right) {
+              if (dp[k + 1][j][right] != -1) {
+                int result = operatorTable[left][right];
+                if (dp[i][j][result] == -1 || dp[i][j][result] < k) {
+                  dp[i][j][result] = k;
+                  ++results_count;
+                }
+              }
             }
           }
         }
@@ -56,7 +68,11 @@ int main() {
     }
   }
 
-  // If no valid expression is found, print 0
-  std::cout << "0" << std::endl;
+  if (dp[0][m - 1][targetResult] == -1) {
+    std::cout << 0 << std::endl;
+  } else {
+    std::string result = reconstruct(0, m - 1, targetResult, dp, operatorTable, sequence);
+    std::cout << 1 << std::endl << result << std::endl;
+  }
   return 0;
 }
