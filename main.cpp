@@ -2,33 +2,6 @@
 #include <vector>
 #include <string>
 
-// Need to change how the reconstruct function works the rest is fine. Function needs to prioritize highest k values.
-std::string reconstruct(int i, int j, int result, const std::vector<std::vector<std::vector<int>>> &dp, const std::vector<std::vector<int>> &operatorTable, const std::vector<int> &sequence) {
-  if (i == j)
-    return std::to_string(sequence[i] + 1);
-
-  int k = -1;
-  int leftResult = -1, rightResult = -1;
-
-  for (int currentK = j - 1; currentK >= i; --currentK) {
-    for (int left = operatorTable.size() - 1; left >= 0 && leftResult == -1; --left) {
-      for (int right = operatorTable.size() - 1; right >= 0; --right) {
-        if (dp[i][currentK][left] != -1 && dp[currentK + 1][j][right] != -1 && operatorTable[left][right] == result) {
-          k = currentK;
-          leftResult = left;
-          rightResult = right;
-          break;
-        }
-      }
-    }
-    if (leftResult != -1) break; // If a valid k is found, break out of the loop
-  }
-
-  std::string leftExpr = reconstruct(i, k, leftResult, dp, operatorTable, sequence);
-  std::string rightExpr = reconstruct(k + 1, j, rightResult, dp, operatorTable, sequence);
-  return "(" + leftExpr + " " + rightExpr + ")";
-}
-
 int main() {
   std::ios::sync_with_stdio(0);
   std::cin.tie(0);
@@ -42,11 +15,12 @@ int main() {
       std::cin >> operatorTable[i][j], --operatorTable[i][j];
 
   std::vector<int> sequence(m);
-  std::vector<std::vector<std::vector<int>>> dp(m, std::vector<std::vector<int>>(m, std::vector<int>(n, -1)));
+  // dp[i][j] = {result, k}
+  std::vector<std::vector<std::vector<std::pair<int, int>>>> dp(m, std::vector<std::vector<std::pair<int, int>>>(m, std::vector<std::pair<int, int>>(n, {-1, -1})));
 
   for (int i = 0; i < m; ++i) {
     std::cin >> sequence[i], --sequence[i];
-    dp[i][i][sequence[i]] = i;
+    dp[i][i].push_back({sequence[i], i});
   }
 
   int targetResult;
@@ -56,24 +30,33 @@ int main() {
     for (int i = 0; i <= m - len; ++i) {
       int j = i + len - 1;
       int results_count = 0;
-      for (int k = j - 1; k >= i && results_count < n; --k)
-        for (int left = 0; left < n && results_count < n; ++left)
-          if (dp[i][k][left] != -1)
-            for (int right = 0; right < n && results_count < n; ++right)
-              if (dp[k + 1][j][right] != -1) {
-                int result = operatorTable[left][right];
-                if (dp[i][j][result] == -1 || dp[i][j][result] < k) {
-                  dp[i][j][result] = k;
-                  ++results_count;
-                }
-              }
+      std::vector<bool> used(n, false);
+      for (int k = j - 1; k >= i && results_count <= n; --k) {
+        for (auto left : dp[i][k]) {
+          if (left.first == -1) continue;
+          for (auto right : dp[k + 1][j]) {
+            if (right.first == -1) continue;
+            int result = operatorTable[left.first][right.first];
+            if (!used[result]) {
+              dp[i][j].push_back({result, k});
+              ++results_count;
+              used[result] = true;
+            }
+            if (results_count >= n) break;
+          }
+          if (results_count >= n) break;
+        }
+      }
     }
 
-  if (dp[0][m - 1][targetResult] == -1) {
-    std::cout << 0 << std::endl;
-  } else {
-    std::string result = reconstruct(0, m - 1, targetResult, dp, operatorTable, sequence);
-    std::cout << 1 << std::endl << result << std::endl;
+  for (auto finalVector : dp[0][m - 1]) {
+    if (finalVector.first == targetResult) {
+      std::cout << 1 << std::endl;
+      std::string parenthesizedSequence = reconstruct(0, m - 1, targetResult, dp, sequence, operatorTable);
+      std::cout << parenthesizedSequence << std::endl;
+      return 0;
+    }
   }
+  std::cout << 0 << std::endl;
   return 0;
 }
