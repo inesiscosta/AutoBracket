@@ -7,16 +7,22 @@ std::string reconstruct(int i, int j, int result, const std::vector<std::vector<
   if (i == j)
     return std::to_string(sequence[i] + 1);
 
-  int k = dp[i][j][result];
+  int k = -1;
   int leftResult = -1, rightResult = -1;
 
-  for (size_t left = 0; left < operatorTable.size() && leftResult == -1; ++left)
-    for (size_t right = 0; right < operatorTable.size(); ++right)
-      if (dp[i][k][left] != -1 && dp[k + 1][j][right] != -1 && operatorTable[left][right] == result) {
-        leftResult = left;
-        rightResult = right;
-        break;
+  for (int currentK = j - 1; currentK >= i; --currentK) {
+    for (int left = operatorTable.size() - 1; left >= 0 && leftResult == -1; --left) {
+      for (int right = operatorTable.size() - 1; right >= 0; --right) {
+        if (dp[i][currentK][left] != -1 && dp[currentK + 1][j][right] != -1 && operatorTable[left][right] == result) {
+          k = currentK;
+          leftResult = left;
+          rightResult = right;
+          break;
+        }
       }
+    }
+    if (leftResult != -1) break; // If a valid k is found, break out of the loop
+  }
 
   std::string leftExpr = reconstruct(i, k, leftResult, dp, operatorTable, sequence);
   std::string rightExpr = reconstruct(k + 1, j, rightResult, dp, operatorTable, sequence);
