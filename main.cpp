@@ -3,9 +3,9 @@
 #include <string>
 
 std::string reconstruct(int i, int j, const std::vector<std::vector<std::vector<std::pair<int, int>>>> &dp, const std::vector<std::vector<int>> &operatorTable, const std::vector<int> &sequence) {
-  // Base case: If the subexpression is only one number it retruns it self
+  // Base case: If the subexpression is only one number it returns it self
   if (i == j) {
-    return std::to_string(sequence[i] + 1); // 1- Index adjust
+    return std::to_string(sequence[i] + 1); // 1-Base Index adjustment for output
   }
 
   // Gets the k split point that gives the desired result
@@ -21,11 +21,11 @@ int main() {
   std::ios::sync_with_stdio(0);
   std::cin.tie(0);
 
-  // Matrix size and sequence lenght
+  // n - Matrix size; m - sequence length
   int n, m;
   std::cin >> n >> m;
 
-  // Reads the matrix from stdin
+  // Reads the matrix from stdin and adjusts the values to 0-Base Index
   std::vector<std::vector<int>> operatorTable(n, std::vector<int>(n));
   for (int i = 0; i < n; ++i)
     for (int j = 0; j < n; ++j)
@@ -35,12 +35,13 @@ int main() {
   // dp[i][j] = {result, k}
   std::vector<std::vector<std::vector<std::pair<int, int>>>> dp(m, std::vector<std::vector<std::pair<int, int>>>(m, std::vector<std::pair<int, int>>(n, {-1, -1})));
 
-  // Initialization of DP table each element is a valid subexpression (matrix diagonal)
+  // DP base case initialization
   for (int i = 0; i < m; ++i) {
     std::cin >> sequence[i], --sequence[i];
     dp[i][i].push_back({sequence[i], i});
   }
 
+  // Reads the target result from stdin and adjusts the value to 0-Base Index
   int targetResult;
   std::cin >> targetResult, --targetResult;
 
@@ -70,7 +71,7 @@ int main() {
   for (auto finalVector : dp[0][m - 1]) {
     if (finalVector.first == targetResult) {
       std::cout << 1 << std::endl;
-      std::string parenthesizedSequence = reconstruct(0, m - 1, dp, operatorTable, sequence); // Function to reconstruct the solution expression
+      std::string parenthesizedSequence = reconstruct(0, m - 1, dp, operatorTable, sequence); // Calls recursive unction to reconstruct the solution expression
       std::cout << parenthesizedSequence << std::endl;
       return 0;
     }
