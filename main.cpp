@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-std::string reconstruct(int i, int j, const std::vector<std::vector<std::vector<std::pair<int, int>>>> &dp, const std::vector<std::vector<int>> &operatorTable, const std::vector<int> &sequence) {
+std::string reconstruct(int i, int j, int result, const std::vector<std::vector<std::vector<std::pair<int, int>>>> &dp, const std::vector<std::vector<int>> &operatorTable, const std::vector<int> &sequence) {
   // Base case: If the subexpression is only one number it returns it self
   if (i == j) {
     return std::to_string(sequence[i] + 1); // 1-Base Index adjustment for output
@@ -10,9 +10,21 @@ std::string reconstruct(int i, int j, const std::vector<std::vector<std::vector<
 
   // Gets the k split point that gives the desired result
   int k = dp[i][j].back().second;
+  int leftResult = -1, rightResult = -1;
 
-  std::string leftExpr = reconstruct(i, k, dp, operatorTable, sequence);
-  std::string rightExpr = reconstruct(k + 1, j, dp, operatorTable, sequence);
+  // Iterates over all possible left and right operators to find the correct split point
+  for (size_t left = 0; left < operatorTable.size() && leftResult == -1; ++left) {
+    for (size_t right = 0; right < operatorTable.size() && rightResult == -1; ++right) {
+      if (dp[i][k][left].first == result && dp[k + 1][j][right].first == result) {
+        leftResult = left;
+        rightResult = right;
+        break;
+      }
+    }
+  }
+
+  std::string leftExpr = reconstruct(i, k, leftResult, dp, operatorTable, sequence);
+  std::string rightExpr = reconstruct(k + 1, j, rightResult, dp, operatorTable, sequence);
   return "(" + leftExpr + " " + rightExpr + ")";
 }
 
@@ -69,7 +81,7 @@ int main() {
   for (auto finalVector : dp[0][m - 1]) {
     if (finalVector.first == targetResult) {
       std::cout << 1 << std::endl;
-      std::string parenthesizedSequence = reconstruct(0, m - 1, dp, operatorTable, sequence); // Calls recursive unction to reconstruct the solution expression
+      std::string parenthesizedSequence = reconstruct(0, m - 1, targetResult, dp, operatorTable, sequence); // Calls recursive function to reconstruct the solution expression
       std::cout << parenthesizedSequence << std::endl;
       return 0;
     }
