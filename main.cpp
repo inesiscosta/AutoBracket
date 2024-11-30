@@ -2,13 +2,30 @@
 #include <vector>
 #include <string>
 
+std::string reconstruct(int i, int j, const std::vector<std::vector<std::vector<std::pair<int, int>>>> &dp, const std::vector<std::vector<int>> &operatorTable, const std::vector<int> &sequence) {
+  // Base case: If the subexpression is only one number it retruns it self
+  if (i == j) {
+    return std::to_string(sequence[i] + 1); // 1- Index adjust
+  }
+
+  // Gets the k split point that gives the desired result
+  int k = dp[i][j].back().second;
+
+  std::string leftExpr = reconstruct(i, k, dp, operatorTable, sequence);
+  std::string rightExpr = reconstruct(k + 1, j, dp, operatorTable, sequence);
+  return "(" + leftExpr + " " + rightExpr + ")";
+}
+
 int main() {
+  // IOStream performance flags so it is closer to using stdio functions (scanf and printf)
   std::ios::sync_with_stdio(0);
   std::cin.tie(0);
 
+  // Matrix size and sequence lenght
   int n, m;
   std::cin >> n >> m;
 
+  // Reads the matrix from stdin
   std::vector<std::vector<int>> operatorTable(n, std::vector<int>(n));
   for (int i = 0; i < n; ++i)
     for (int j = 0; j < n; ++j)
@@ -18,6 +35,7 @@ int main() {
   // dp[i][j] = {result, k}
   std::vector<std::vector<std::vector<std::pair<int, int>>>> dp(m, std::vector<std::vector<std::pair<int, int>>>(m, std::vector<std::pair<int, int>>(n, {-1, -1})));
 
+  // Initialization of DP table each element is a valid subexpression (matrix diagonal)
   for (int i = 0; i < m; ++i) {
     std::cin >> sequence[i], --sequence[i];
     dp[i][i].push_back({sequence[i], i});
@@ -52,11 +70,11 @@ int main() {
   for (auto finalVector : dp[0][m - 1]) {
     if (finalVector.first == targetResult) {
       std::cout << 1 << std::endl;
-      std::string parenthesizedSequence = reconstruct(0, m - 1, targetResult, dp, sequence, operatorTable);
+      std::string parenthesizedSequence = reconstruct(0, m - 1, dp, operatorTable, sequence); // Function to reconstruct the solution expression
       std::cout << parenthesizedSequence << std::endl;
       return 0;
     }
   }
-  std::cout << 0 << std::endl;
+  std::cout << 0 << std::endl; // Prints 0 to stdout if no solution is found
   return 0;
 }
