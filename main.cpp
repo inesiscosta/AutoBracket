@@ -33,7 +33,7 @@ int main() {
 
   std::vector<int> sequence(m);
   // dp[i][j] = {result, k}
-  std::vector<std::vector<std::vector<std::pair<int, int>>>> dp(m, std::vector<std::vector<std::pair<int, int>>>(m, std::vector<std::pair<int, int>>(n, {-1, -1})));
+  std::vector<std::vector<std::vector<std::pair<int, int>>>> dp(m, std::vector<std::vector<std::pair<int, int>>>(m));
 
   // DP base case initialization
   for (int i = 0; i < m; ++i) {
@@ -48,9 +48,8 @@ int main() {
   for (int len = 2; len <= m; ++len)
     for (int i = 0; i <= m - len; ++i) {
       int j = i + len - 1;
-      int results_count = 0;
       std::vector<bool> used(n, false);
-      for (int k = j - 1; k >= i && results_count <= n; --k) {
+      for (int k = j - 1; k >= i && dp[i][j].size() <= static_cast<size_t>(n); --k) {
         for (auto left : dp[i][k]) {
           if (left.first == -1) continue;
           for (auto right : dp[k + 1][j]) {
@@ -58,12 +57,11 @@ int main() {
             int result = operatorTable[left.first][right.first];
             if (!used[result]) {
               dp[i][j].push_back({result, k});
-              ++results_count;
               used[result] = true;
             }
-            if (results_count >= n) break;
+            if (dp[i][j].size() >= static_cast<size_t>(n)) break;
           }
-          if (results_count >= n) break;
+          if (dp[i][j].size() >= static_cast<size_t>(n)) break;
         }
       }
     }
