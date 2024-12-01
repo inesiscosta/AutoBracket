@@ -24,8 +24,12 @@ test: $(TARGET)
 		output=$${input%.in}.out; \
 		result=$${input%.in}.result; \
 		diff_file=$${input%.in}.diff; \
-		./$(TARGET) < $$input > $$result; \
-		if diff -q $$result $$output > /dev/null; then \
+		timeout 90 ./$(TARGET) < $$input > $$result; \
+		if [ $$? -eq 124 ]; then \
+			echo ""; \
+			test_name=$$(basename $$input .in); \
+			echo "Failed $$test_name: Time limit exceeded"; \
+		elif diff -q $$result $$output > /dev/null; then \
 			printf "."; \
 			passed_tests=$$((passed_tests + 1)); \
 		else \
@@ -38,7 +42,6 @@ test: $(TARGET)
 	echo ""; \
 	echo "Tests passed $$passed_tests out of $$total_tests"; \
 	$(MAKE) -s clean
-
 
 time: $(TARGET)
 	@for input in $(wildcard tests/*.in); do \
