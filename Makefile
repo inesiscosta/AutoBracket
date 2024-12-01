@@ -57,6 +57,14 @@ clean:
 rm:
 	@$(MAKE) -s clean
 	@rm -f tests/*.result tests/*.diff
+	@rm -f tests/test_generator
 
 format:
 	@clang-format -i $(SRCS)
+
+test_generator: tests/test_generator.cpp
+		@$(CXX) $(CXXFLAGS) -o tests/test_generator tests/test_generator.cpp
+
+run_generator: test_generator
+		@./tests/test_generator $(ARGS)
+		@$(MAKE) -s rm
