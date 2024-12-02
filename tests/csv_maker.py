@@ -19,7 +19,7 @@ def monitor_memory(process, memory_usage_list):
 
 def run_program(test_file):
     start_time = time.time()
-    process = subprocess.Popen(['./main'], stdin=open(test_file, 'r', encoding='utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(['../src/main'], stdin=open(test_file, 'r', encoding='utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     memory_usage_list = []
     memory_thread = threading.Thread(target=monitor_memory, args=(process, memory_usage_list))
     memory_thread.start()
