@@ -3,10 +3,10 @@
 #include <string>
 #include <tuple>
 
-std::string reconstruct(int i, int j, int result,
-const std::vector<std::vector<std::vector<std::tuple<int, int, int, int>>>> &dp,
-const std::vector<std::vector<int>> &operatorTable,
-const std::vector<int> &sequence) {
+std::vector<int> sequence;
+std::vector<std::vector<std::vector<std::tuple<int, int, int, int>>>> dp;
+
+std::string reconstruct(int i, int j, int result) {
   // Base case: If the subexpression is only one number it returns it self as a string.
   if (i == j)
     return std::to_string(sequence[i] + 1); // 1-Base Index adjustment for output
@@ -14,8 +14,8 @@ const std::vector<int> &sequence) {
     if (std::get<0>(currentTuple) == result) {
       int k = std::get<1>(currentTuple);
       return "(" +
-      reconstruct(i, k, std::get<2>(currentTuple), dp, operatorTable, sequence) + " " +
-      reconstruct(k + 1, j, std::get<3>(currentTuple), dp, operatorTable, sequence) +
+      reconstruct(i, k, std::get<2>(currentTuple)) + " " +
+      reconstruct(k + 1, j, std::get<3>(currentTuple)) +
       ")";
     }
   return ""; // This should never happen.
@@ -36,10 +36,9 @@ int main() {
     for (int j = 0; j < n; ++j)
       std::cin >> operatorTable[i][j], --operatorTable[i][j];
 
-  std::vector<int> sequence(m);
+  sequence.resize(m);
   // dp[i][j] = {result, k, leftResult, rightResult}
-  std::vector<std::vector<std::vector<std::tuple<int, int, int, int>>>> dp
-  (m, std::vector<std::vector<std::tuple<int, int, int, int>>>(m));
+  dp.resize(m, std::vector<std::vector<std::tuple<int, int, int, int>>>(m));
 
   // DP initialization
   for (int i = 0; i < m; ++i) {
@@ -57,8 +56,9 @@ int main() {
       int j = i + len - 1; // Ending point of the current subexpression
       // Track used results to avoid overwriting better expressions for the same result
       std::vector<bool> used(n, false);
+      int resultsFound = 0;
       // Iterate over all possible split points
-      for (int k = j - 1; k >= i && dp[i][j].size() <= static_cast<size_t>(n); --k)
+      for (int k = j - 1; k >= i && resultsFound <= n; --k)
         // Iterate over all possible results of the left subexpression
         for (const auto &left : dp[i][k]) {
           int leftResult = std::get<0>(left);
@@ -67,12 +67,14 @@ int main() {
             int rightResult = std::get<0>(right);
             int result = operatorTable[leftResult][rightResult];
             if (!used[result]) { // If this result has not been used yet
-              dp[i][j].emplace_back(result, k, leftResult, rightResult); // Store the result, the split point and the left and right results used
+            // Store the result, the split point and the left and right results used
+              dp[i][j].emplace_back(result, k, leftResult, rightResult);
               used[result] = true; // Mark this result as used
+              ++resultsFound; // Increment the number of results found
             }
-            if (dp[i][j].size() >= static_cast<size_t>(n)) break; // Stop if we have enough results
+            if (resultsFound >= n) break; // Stop if we have enough results
           }
-          if (dp[i][j].size() >= static_cast<size_t>(n)) break; // Stop if we have enough results
+          if (resultsFound >= n) break; // Stop if we have enough results
         }
     }
 
@@ -80,8 +82,7 @@ int main() {
     if (std::get<0>(finalTuple) == targetResult) {
       std::cout << 1 << std::endl;
       // Calls recursive function to reconstruct the final expression
-      std::string parenthesizedSequence = reconstruct
-      (0, m - 1, targetResult, dp, operatorTable, sequence);
+      std::string parenthesizedSequence = reconstruct(0, m - 1, targetResult);
       std::cout << parenthesizedSequence << std::endl;
       return 0;
     }
