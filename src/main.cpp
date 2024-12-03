@@ -10,12 +10,12 @@ const std::vector<int> &sequence) {
   // Base case: If the subexpression is only one number it returns it self as a string.
   if (i == j)
     return std::to_string(sequence[i] + 1); // 1-Base Index adjustment for output
-  for (const auto &finalVector : dp[i][j])
-    if (std::get<0>(finalVector) == result) {
-      int k = std::get<1>(finalVector);
+  for (const auto &currentTuple : dp[i][j])
+    if (std::get<0>(currentTuple) == result) {
+      int k = std::get<1>(currentTuple);
       return "(" +
-      reconstruct(i, k, std::get<2>(finalVector), dp, operatorTable, sequence) + " " +
-      reconstruct(k + 1, j, std::get<3>(finalVector), dp, operatorTable, sequence) +
+      reconstruct(i, k, std::get<2>(currentTuple), dp, operatorTable, sequence) + " " +
+      reconstruct(k + 1, j, std::get<3>(currentTuple), dp, operatorTable, sequence) +
       ")";
     }
   return ""; // This should never happen.
@@ -76,8 +76,8 @@ int main() {
         }
     }
 
-  for (const auto &finalVector : dp[0][m - 1])
-    if (std::get<0>(finalVector) == targetResult) {
+  for (const auto &finalTuple : dp[0][m - 1])
+    if (std::get<0>(finalTuple) == targetResult) {
       std::cout << 1 << std::endl;
       // Calls recursive function to reconstruct the final expression
       std::string parenthesizedSequence = reconstruct

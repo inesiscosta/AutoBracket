@@ -34,7 +34,7 @@ def run_program(test_file):
     return execution_time, peak_memory_usage
 
 def main():
-    tests_folder = 'tests'
+    tests_folder = os.path.dirname(os.path.abspath(__file__))
     results = []
 
     for test_file in os.listdir(tests_folder):
