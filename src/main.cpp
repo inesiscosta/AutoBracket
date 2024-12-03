@@ -10,7 +10,7 @@ std::string reconstruct(int i, int j, int result) {
   // Base case: If the subexpression is only one number it returns it self as a string.
   if (i == j)
     return std::to_string(sequence[i] + 1); // 1-Base Index adjustment for output
-  for (const auto &currentTuple : dp[i][j])
+  for (const std::tuple<int, int, int, int> &currentTuple : dp[i][j])
     if (std::get<0>(currentTuple) == result) {
       int k = std::get<1>(currentTuple);
       return "(" +
@@ -60,10 +60,10 @@ int main() {
       // Iterate over all possible split points
       for (int k = j - 1; k >= i && resultsFound <= n; --k)
         // Iterate over all possible results of the left subexpression
-        for (const auto &left : dp[i][k]) {
+        for (std::tuple<int, int, int, int> &left : dp[i][k]) {
           int leftResult = std::get<0>(left);
           // Iterate over all possible results of the right subexpression
-          for (const auto &right : dp[k + 1][j]) {
+          for (std::tuple<int, int, int, int> &right : dp[k + 1][j]) {
             int rightResult = std::get<0>(right);
             int result = operatorTable[leftResult][rightResult];
             if (!used[result]) { // If this result has not been used yet
@@ -78,7 +78,7 @@ int main() {
         }
     }
 
-  for (const auto &finalTuple : dp[0][m - 1])
+  for (std::tuple<int, int, int, int> &finalTuple : dp[0][m - 1])
     if (std::get<0>(finalTuple) == targetResult) {
       std::cout << 1 << std::endl;
       // Calls recursive function to reconstruct the final expression
