@@ -56,7 +56,7 @@ clean:
 
 rm:
 	@$(MAKE) -s clean
-	@rm -f ../tests/*.result tests/*.diff
+	@rm -f ../tests/*.result ../tests//*.diff
 	@rm -f ../tests/test_generator
 
 format:
