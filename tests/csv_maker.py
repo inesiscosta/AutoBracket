@@ -5,6 +5,7 @@ import subprocess
 import platform
 import threading
 import psutil
+import sys
 
 def get_test_sizes(test_file):
     with open(test_file, 'r', encoding='utf-8') as file:
@@ -35,21 +36,25 @@ def run_program(test_file):
 
 def main():
     tests_folder = os.path.dirname(os.path.abspath(__file__))
-    results = []
+    if len(sys.argv) != 2:
+        print("Usage: python csv_maker.py <number_of_iterations>")
+        sys.exit(1)
+    it_num = int(sys.argv[1])
 
-    for test_file in os.listdir(tests_folder):
-        if test_file.endswith('.in'):
-            test_path = os.path.join(tests_folder, test_file)
-            matrix_size, sequence_size = get_test_sizes(test_path)
-            execution_time, memory_usage = run_program(test_path)
-            results.append([test_file, matrix_size, sequence_size, execution_time, memory_usage])
-
-    platform_name = platform.system().lower()
-    architecture = platform.machine().lower()
-    with open( f'results_{platform_name}_{architecture}.csv', 'w', newline='', encoding='utf-8') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(['Test File', 'OperationTable Size', 'Sequence Size', 'Execution Time (s)', 'Memory Usage (MB)'])
-        csv_writer.writerows(results)
+    for i in range(it_num):
+        results = []
+        for test_file in os.listdir(tests_folder):
+            if test_file.endswith('.in'):
+                test_path = os.path.join(tests_folder, test_file)
+                matrix_size, sequence_size = get_test_sizes(test_path)
+                execution_time, memory_usage = run_program(test_path)
+                results.append([test_file, matrix_size, sequence_size, execution_time, memory_usage])
+        platform_name = platform.system().lower()
+        architecture = platform.machine().lower()
+        with open( f'results_{platform_name}_{architecture}_{i}.csv', 'w', newline='', encoding='utf-8') as csvfile:
+            csv_writer = csv.writer(csvfile)
+            csv_writer.writerow(['Test File', 'OperationTable Size', 'Sequence Size', 'Execution Time (s)', 'Memory Usage (MB)'])
+            csv_writer.writerows(results)
 
 if __name__ == '__main__':
     main()

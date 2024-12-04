@@ -64,5 +64,8 @@ format:
 
 new_test: ../tests/test_generator.cpp
 	@$(CXX) $(CXXFLAGS) -o ../tests/test_generator ../tests/test_generator.cpp
-	@../tests/test_generator $(ARGS)
+	@for args in '2 1' '2 2' '2 3' '2 4' '10 5' '10 10' '10 15' '10 20' '20 10' '20 20' '20 30' '20 40' '50 25' '50 50' '50 75' '50 100' '100 50' '100 100' '100 150' '100 200' '200 100' '200 200' '200 300' '200 400' '500 250' '500 500' '500 750' '500 1000' '1000 500' '1000 1000'; do \
+		output_file="../tests/test$${args// /_}.in"; \
+		../tests/test_generator $$args > $$output_file; \
+	done
 	@$(MAKE) -s rm
