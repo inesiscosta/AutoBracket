@@ -2,7 +2,7 @@
 
 ## Overview
 
-AutoBracket is an algorithm designed to determine the correct parenthesization of a sequence of binary operations over integers, given an operator table. This project was developed for the Analysis and Synthesis of Algorithms class.
+AutoBracket is an algorithm designed to determine the correct parenthesization of a sequence of binary operations over integers, given an operator table. This project was developed for an Algorithm Analysis and Synthesis class.
 
 ## Problem Description
 
